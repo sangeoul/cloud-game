@@ -1,18 +1,22 @@
 
-const __BOARD_WIDTH=10
-const __BOARD_HEIGHT=20
+const __BOARD_WIDTH=10;
+const __BOARD_HEIGHT=20;
 
-const __WORD_WIDTH=60
-const __WORD_HEIGHT=10
-const __FONT_SIZE=12
+const __WORD_WIDTH=60;
+const __WORD_HEIGHT=10;
+const __FONT_SIZE=12;
 
-const __MOVING_RATE=0.2
+const __MOVING_RATE=0.2;
 const __PENALTY_RATE=1;
 
+var __VARIABLE_DIFFICULTY_RATE=1; 
 
 
-var insult:HTMLInputElement;
-var board:HTMLDivElement;
+
+var insult:HTMLInputElement=<HTMLInputElement>document.getElementById("typingInput");
+var button:HTMLInputElement=<HTMLInputElement>document.getElementById("typingButton");
+var board:HTMLDivElement=<HTMLDivElement>document.getElementById("board");
+
 
 
 class Word {
@@ -54,6 +58,12 @@ class Cloud{
         this.px=0;
         this.py=0;
         this.direction=1;
+
+        for(let i=0;i<this.width;i++){
+            for(let j=0;j<this.height;j++){
+                this.words[i][j]=new Word("A","a");
+            }
+        }
     }
 
 
@@ -97,6 +107,7 @@ class Cloud{
         if(x_==0 || x_==this.width-1 || y_==0 || y_==this.height-1){
             this.optimizeSize();
         }
+        this.display();
         
 
     }
