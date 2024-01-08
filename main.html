@@ -1,13 +1,17 @@
 <html>
+<head>
+    <meta charset="UTF-8">
+</head>
 
 
-<div id="board" width="800" height="500">
+<div id="board" style="width:800px;height:500px;">
 
 </div>
 <br>
-<input type="text" id="typingInput">
-<input type="button" id="typingButton" onClick="Submit()">
-
+<form action="javascript:Submit();">
+    <input type="text" id="typingInput">
+    <input type="submit" id="typingSubmit" value="Enter">
+</form>
 
 <script type="text/javascript" src="cloud.js"></script>
 </html>
