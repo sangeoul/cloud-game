@@ -1,0 +1,25 @@
+@font-face{
+    font-family:"Gyeonggi Cheonnyeon";
+    src: url("./Batang_Regular.woff") format("woff");
+    font-weight:normal;
+}
+
+div.studentName {
+
+    font-family:"Gyeonggi Cheonnyeon";
+    border: solid black 1px ;
+}
+
+.studentName{
+    font-family:"Gyeonggi Cheonnyeon";
+}
+
+
+
+
+input#typingInput {
+    height:36px;
+    width:200px;
+    font-size:24px;
+    font-family:"Gyeonggi Cheonnyeon";
+}

@@ -1,17 +1,22 @@
 <html>
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="./cloud.css">
 </head>
 
 
-<div id="board" style="width:800px;height:500px;">
+<table id="table_gameboard">
+    <tr><td>
+<div id="div_board" class="studentName">
 
 </div>
-<br>
-<form action="javascript:Submit();">
-    <input type="text" id="typingInput">
-    <input type="submit" id="typingSubmit" value="Enter">
+</td></tr>
+<tr><td>
+<form action="javascript:Submit();" align="center">
+    <input type="text" id="input_typingInput">
+    <input type="submit" id="input_typingSubmit" value="Enter">
 </form>
-
-<script type="text/javascript" src="cloud.js"></script>
+</td></tr>
+</table>
+<script type="text/javascript" src="./cloud.js"></script>
 </html>

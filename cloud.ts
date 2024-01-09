@@ -8,9 +8,9 @@ const __FONT_SIZE=14;
 const __MOVING_RATE=0.2;
 const __PENALTY_RATE=1;
 
-const __MOVE_BASE_INTERVAL=1000;
-const __MOVE_SPEED=10;
-const __SMOOTHER=30;
+
+const __BASE_SPEED=10;
+const __ANIMATION_INTERVAL=500; //millisecond
 
 const student=[
     ["스나오오카미","시로코"],
@@ -116,14 +116,14 @@ var __VARIABLE_DIFFICULTY_RATE=1;
 
 window.console.log("JS loaded");
 
-var insult:HTMLInputElement=<HTMLInputElement>document.getElementById("typingInput");
-var submitButton:HTMLInputElement=<HTMLInputElement>document.getElementById("typingSubmit");
-var board:HTMLDivElement=<HTMLDivElement>document.getElementById("board");
+var insult:HTMLInputElement=<HTMLInputElement>document.getElementById("input_typingInput");
+var submitButton:HTMLInputElement=<HTMLInputElement>document.getElementById("input_typingSubmit");
+var board:HTMLDivElement=<HTMLDivElement>document.getElementById("div_board");
 
 
 board.style.width=<string>((__BOARD_WIDTH*(__WORD_WIDTH))+"px");
 board.style.height=<string>((__BOARD_HEIGHT*(__WORD_HEIGHT))+"px");
-board.style.border="solid black 1px";
+//board.style.border="solid black 1px";
 
 class Word {
     k:string;
@@ -139,6 +139,7 @@ class Word {
 
         this.object=document.createElement("span");
         this.object.style.position="absolute";
+        this.object.className="studentName";
         this.object.innerHTML=key_;
         board.appendChild(this.object);
 
@@ -173,14 +174,49 @@ class Cloud{
         
         this.words=[];
 
+        
+        //단어 수가 학생수보다 적으면 중복 없이 뽑아 준다.
+        if(this.width*this.height<student.length){
+            let studentlist:string[][]=[];
 
+            let temp_student:string[][]=[];
 
-        for(let i=0;i<this.width;i++){
-            this.words[i]=[];
-            for(let j=0;j<this.height;j++){
-                this.words[i][j]=new Word(student[j*this.width+i][1],student[j*this.width+i][0]);
+            for(let i=0;i<student.length;i++){
+
+                temp_student[i]=[];
+                temp_student[i][0]=student[i][0];
+                temp_student[i][1]=student[i][1];
+            }
+            for(let i=0;i<this.width*this.height;i++){
+                let p= Math.floor(Math.random()*(student.length-i));
+                studentlist[i]=[];
+                studentlist[i][0]=temp_student[p][0];
+                studentlist[i][1]=temp_student[p][1];
+
+                for(let j=p;j<student.length-i-1;j++){
+                    temp_student[j][0]=temp_student[j+1][0];
+                    temp_student[j][1]=temp_student[j+1][1];
+                }
+            }
+            for(let i=0;i<this.width;i++){
+                this.words[i]=[];
+                for(let j=0;j<this.height;j++){
+                    this.words[i][j]=new Word(studentlist[j*this.width+i][1],studentlist[j*this.width+i][0]);
+                }
             }
         }
+        
+        //단어 수가 학생 수보다 많으면 그냥 랜덤으로 뽑는다.
+        else{
+            alert("단어 구름 크기가 너무 커서 중복된 단어가 나옵니다.");
+            for(let i=0;i<this.width;i++){
+                this.words[i]=[];
+                for(let j=0;j<this.height;j++){
+                this.words[i][j]=new Word(student[Math.floor(Math.random()*j*this.width+i)][1],student[Math.floor(Math.random()*j*this.width+i)][0]);
+                }
+            }
+        }
+
         this.display();
     }
 
@@ -339,14 +375,35 @@ function Submit(){
 
 }
 
-var autoMoveInterval=setInterval(autoMove,(__MOVE_BASE_INTERVAL*10/__MOVE_SPEED)/__SMOOTHER,1/__SMOOTHER);
 
-function autoMove(interval_){
-    cloud.move(interval_);
+var startTime:number,liveTime:number;
+var requestAnimationFrameSession;
+var gameLive:boolean=false;
+
+gameStart();
+
+function gameStart(){
+    
+    startTime=Date.now();
+    liveTime=startTime;
+    gameLive=true;
+    requestAnimationFrameSession=requestAnimationFrame(gameFlow);
+}
+
+function gameFlow(){
+
+    if(Date.now()-liveTime>__ANIMATION_INTERVAL){
+        cloud.move(__BASE_SPEED*__ANIMATION_INTERVAL/10000);
+        liveTime+=__ANIMATION_INTERVAL;
+    }
+    if(gameLive){
+        requestAnimationFrameSession=requestAnimationFrame(gameFlow);
+    }
+    
 }
 
 function gameOver(){
-    clearInterval(autoMoveInterval);
+    gameLive=false;
     alert("GAME OVER");
 }
 
