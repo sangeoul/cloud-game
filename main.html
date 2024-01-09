@@ -5,18 +5,51 @@
 </head>
 
 
+<table id="table_preparation">
+<tr><td>
+    <img src="./startmenu.png" id="img_startMenu">
+    <img src="./confirm.png" id="img_startButton" onclick="gameStart()">
+</td></tr>
+</table>
+
 <table id="table_gameboard">
-    <tr><td>
+    <tr><td id="td_gameboard">
 <div id="div_board" class="studentName">
 
 </div>
 </td></tr>
 <tr><td>
+    <span id="span_hint">HINT</span>
 <form action="javascript:Submit();" align="center">
+    
     <input type="text" id="input_typingInput">
     <input type="submit" id="input_typingSubmit" value="Enter">
 </form>
 </td></tr>
 </table>
+
+
+<table id="table_winscreen">
+    <tr><td>
+        <img id="img_win" src="./result/win-arona1.png">
+
+    </td></tr>
+</table>
+
+
+
+
+<table id="table_defeatscreen">
+    <tr><td>
+        <span id="span_defeatScore"></span>
+        <img id="img_defeat" src="./result/n.jpg">
+    
+    </td></tr>
+    </table>
+
+
+
+
+
 <script type="text/javascript" src="./cloud.js"></script>
 </html>

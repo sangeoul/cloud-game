@@ -1,25 +1,102 @@
 @font-face{
-    font-family:"Gyeonggi Cheonnyeon";
+    font-family:"Gyeonggi Cheonnyeon Batang";
     src: url("./Batang_Regular.woff") format("woff");
+    font-weight:normal;
+}
+
+@font-face{
+    font-family:"Gyeonggi Cheonnyeon Title";
+    src: url("./Title_Medium.woff") format("woff");
     font-weight:normal;
 }
 
 div.studentName {
 
-    font-family:"Gyeonggi Cheonnyeon";
-    border: solid black 1px ;
+    font-family:"Gyeonggi Cheonnyeon Batang";
+    /*border: solid black 1px ;*/
+    background-color: rgb(179, 237, 255);
+    position:
 }
 
 .studentName{
-    font-family:"Gyeonggi Cheonnyeon";
+    font-family:"Gyeonggi Cheonnyeon Batang";
+}
+
+table{
+    width:864px;
+    height:360px;
+    background-color:white;
+}
+table#table_preparation{    
+    display:block;
+    border: solid black 1px;
+}
+
+img#img_startMenu{
+    width:360px;
+    margin-left:240px;
+    position:absolute;
+}
+img#img_startButton{
+    width:200px;
+    
+    margin-left:320px;
+    margin-top:200px;
+    position:absolute;
+}
+img#img_startButton:active{
+    width:192px;
+    
+    margin-left:324px;
+    margin-top:201px;
+    position:absolute;  
+}
+
+
+table#table_gameboard{
+    display:none;
+}
+td#td_gameboard{
+    border: solid black 1px;
+    background-color:rgb(179, 237, 255);
+}
+
+
+table#table_winscreen{
+    display:none;
+}
+
+
+table#table_defeatscreen{
+    display:none;
+}
+img#img_defeat{
+    z-index:0;
+}
+
+span#span_defeatScore{
+    font-family:"Gyeonggi Cheonnyeon Title";
+    font-size:30px;
+    color:rgb(55,55,55);
+    position:absolute;
+    margin-left:450px;
+    margin-top:250px;
+    z-index:2;
 }
 
 
 
-
-input#typingInput {
+span#span_hint{
+    font-family:"Gyeonggi Cheonnyeon Batang";
+    font-size:18px;
+    color: rgba(0,0,0,0.2);
+    position:absolute;
+    margin-left:100px;
+    margin-top:5px; 
+}
+input#input_typingInput {
     height:36px;
     width:200px;
     font-size:24px;
-    font-family:"Gyeonggi Cheonnyeon";
+    font-family:"Gyeonggi Cheonnyeon Batang";
 }

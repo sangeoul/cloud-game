@@ -1,16 +1,24 @@
-const __BOARD_WIDTH=10;
+const __BOARD_WIDTH=12;
 const __BOARD_HEIGHT=20;
 
-const __WORD_WIDTH=75;
+const __WORD_WIDTH=72;
 const __WORD_HEIGHT=18;
 const __FONT_SIZE=14;
 
 const __MOVING_RATE=0.2;
 const __PENALTY_RATE=1;
 
+const __MAX_WIDTH=8;
+const __MAX_HEIGHT=10;
 
-const __BASE_SPEED=10;
-const __ANIMATION_INTERVAL=500; //millisecond
+
+const __BASE_SPEED=10; //default 10;
+const __ANIMATION_INTERVAL=400; //millisecond
+
+const __HINT_TIMER=6000;
+
+const __GAME_WIDTH=7;
+const __GAME_HEIGHT=5;
 
 const student=[
     ["스나오오카미","시로코"],
@@ -31,7 +39,7 @@ const student=[
     ["시시도우","이즈미"],
     ["와니부치","아카리"],
     ["아카시","준코"],
-    ["아아키요","후우카"],
+    ["아이키요","후우카"],
     ["우시마키","주리"],
     ["히무로","세나"],
     ["우시오","노아"],
@@ -116,14 +124,23 @@ var __VARIABLE_DIFFICULTY_RATE=1;
 
 window.console.log("JS loaded");
 
-var insult:HTMLInputElement=<HTMLInputElement>document.getElementById("input_typingInput");
-var submitButton:HTMLInputElement=<HTMLInputElement>document.getElementById("input_typingSubmit");
-var board:HTMLDivElement=<HTMLDivElement>document.getElementById("div_board");
+var input_insult:HTMLInputElement=<HTMLInputElement>document.getElementById("input_typingInput");
+var input_submitButton:HTMLInputElement=<HTMLInputElement>document.getElementById("input_typingSubmit");
+var div_board:HTMLDivElement=<HTMLDivElement>document.getElementById("div_board");
+var span_hint:HTMLSpanElement=<HTMLSpanElement>document.getElementById("span_hint");
+
+var hintOn:boolean=false;
 
 
-board.style.width=<string>((__BOARD_WIDTH*(__WORD_WIDTH))+"px");
-board.style.height=<string>((__BOARD_HEIGHT*(__WORD_HEIGHT))+"px");
-//board.style.border="solid black 1px";
+div_board.style.width=<string>((__BOARD_WIDTH*(__WORD_WIDTH))+"px"); //864
+div_board.style.height=<string>((__BOARD_HEIGHT*(__WORD_HEIGHT))+"px"); //360
+
+
+var startTime:number,liveTime:number,hintTime:number;
+var requestAnimationFrameSession;
+var gameLive:boolean=false;
+
+var score:number=0;
 
 class Word {
     k:string;
@@ -141,7 +158,7 @@ class Word {
         this.object.style.position="absolute";
         this.object.className="studentName";
         this.object.innerHTML=key_;
-        board.appendChild(this.object);
+        div_board.appendChild(this.object);
 
     }
 
@@ -166,6 +183,13 @@ class Cloud{
     direction:number;
 
     constructor(w_:number,h_:number){
+
+        
+        if(w_>__MAX_WIDTH) w_=__MAX_WIDTH;
+        if(h_>__MAX_HEIGHT) w_=__MAX_HEIGHT;
+
+
+
         this.width=w_;
         this.height=h_;
         this.px=0;
@@ -234,7 +258,7 @@ class Cloud{
             this.direction=1;
         }
         if(this.py+this.height>=__BOARD_HEIGHT){
-            gameOver();
+            gameOver(false);
         }
 
         this.display();
@@ -267,6 +291,10 @@ class Cloud{
             this.optimizeSize();
         }
         this.display();
+
+        if(this.height==0){
+            gameOver(true);
+        }
         
 
     }
@@ -303,6 +331,10 @@ class Cloud{
             this.py++;
         }
 
+        if(this.height==0){
+            return;
+        }
+
         //아랫줄 제거
         cut=true;
         for(let i=0;i<this.width;i++){
@@ -310,6 +342,7 @@ class Cloud{
                 cut=false;
             }
         }
+
         if(cut){
             this.height--;
         }
@@ -355,14 +388,14 @@ class Cloud{
 
 }
 
-var cloud:Cloud=new Cloud(6,4);
-insult.focus();
+var cloud:Cloud=new Cloud(0,0);
+
 
 function Submit(){
 
-    let inputword:string=insult.value;
-    insult.value="";
-    insult.focus();
+    let inputword:string=input_insult.value;
+    input_insult.value="";
+    input_insult.focus();
 
     let target:number[]=cloud.findWord(inputword);
 
@@ -371,39 +404,125 @@ function Submit(){
     }
     else{
         cloud.killWord(target[0],target[1]);
+        score++;
+        span_hint.innerHTML="";
+        hintOn=false;
+        hintTime=Date.now();
     }
 
 }
 
 
-var startTime:number,liveTime:number;
-var requestAnimationFrameSession;
-var gameLive:boolean=false;
 
-gameStart();
+
+//gameStart();
 
 function gameStart(){
+
+    document.getElementById("table_preparation").style.display="none";
+    document.getElementById("table_gameboard").style.display="block";
+    document.getElementById("table_winscreen").style.display="none";
+    document.getElementById("table_defeatscreen").style.display="none";
     
+    hintOn=false;
+    span_hint.innerHTML="";
+    
+
+    cloud=new Cloud(__GAME_WIDTH,__GAME_HEIGHT);
+    score=0;
+    input_insult.focus();
     startTime=Date.now();
     liveTime=startTime;
     gameLive=true;
+    hintTime=Date.now();
     requestAnimationFrameSession=requestAnimationFrame(gameFlow);
 }
 
 function gameFlow(){
 
     if(Date.now()-liveTime>__ANIMATION_INTERVAL){
-        cloud.move(__BASE_SPEED*__ANIMATION_INTERVAL/10000);
+
+
+        cloud.move(((__BOARD_WIDTH-cloud.width)/5)*__BASE_SPEED*__ANIMATION_INTERVAL/10000);
         liveTime+=__ANIMATION_INTERVAL;
     }
     if(gameLive){
         requestAnimationFrameSession=requestAnimationFrame(gameFlow);
     }
+
+    if(Date.now()-hintTime>__HINT_TIMER && !hintOn){
+        hintOn=true;
+        let hintStudent:Word=findRandomStudent();
+        span_hint.innerHTML=hintStudent.v;
+    }
     
 }
 
-function gameOver(){
+function findRandomStudent():Word{
+
+    var list:number[]=[];
+
+    var p=0;
+
+    for(let i=0;i<cloud.width;i++){
+        for(let j=0;j<cloud.height;j++){
+            if(cloud.words[i][j].status==true){
+                list[p]=j*cloud.width+i;
+                p++;
+            }
+        }
+    }
+
+    let n=Math.floor(Math.random()*p);
+
+    return cloud.words[list[n]%cloud.width][Math.floor(list[n]/cloud.width)];
+}
+
+function gameOver(win_:boolean=false){
     gameLive=false;
-    alert("GAME OVER");
+
+    if(win_){
+        alert("GAME WIN");
+
+
+
+
+        document.getElementById("table_preparation").style.display="none";
+        document.getElementById("table_gameboard").style.display="none";
+        document.getElementById("table_winscreen").style.display="block";
+        document.getElementById("table_defeatscreen").style.display="none";
+        
+    }
+    else{
+
+        alert("GAME OVER");
+
+        let tmp_student=findRandomStudent();
+        let _image:HTMLImageElement=<HTMLImageElement>document.getElementById("img_defeat");
+
+
+
+            //DEBUG
+            console.log(score);
+        if(score>__GAME_WIDTH*__GAME_HEIGHT/2){
+            
+
+            _image.src="./result/defeat-arona2.png";
+            
+        }
+        else{
+            _image.src="./result/defeat-arona1.png";
+
+        }
+        document.getElementById("span_defeatScore").innerHTML="점수 : "+score+"/"+(__GAME_HEIGHT*__GAME_WIDTH)+" ("+Math.floor(score*100/(__GAME_HEIGHT*__GAME_WIDTH))+"%)"
+        
+        document.getElementById("table_preparation").style.display="none";
+        document.getElementById("table_gameboard").style.display="none";
+        document.getElementById("table_winscreen").style.display="none";
+        document.getElementById("table_defeatscreen").style.display="block";
+
+        
+    }
+    
 }
 
